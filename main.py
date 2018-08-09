@@ -1,12 +1,11 @@
 import rawpy
 import imageio
-from plant_phenotyping.utils import ensure_dir, file_message, files
+from utils import ensure_dir, file_message, files
 import cv2
 import numpy as np
 from PIL import Image
 
-DIR = "I:/Doctoraat/Plant photos/20180615 Plant 1"
-APP_DIR = "C:/Users/Breght/Documents/Doctoraat/Annotator"
+DIR = "./photos/plant1_20180615/entire_plant"
 
 RAW_DIR = DIR + "/raw"
 IMG_DIR = DIR + "/images"

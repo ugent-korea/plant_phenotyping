@@ -1,9 +1,4 @@
-import pandas as pd
 import os
-import datetime
-import pickle
-import cv2
-from subprocess import Popen, PIPE, STDOUT
 
 
 def ifelse(condition, a, b):
