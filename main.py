@@ -42,6 +42,8 @@ def threshold_segmentation(in_f, out_f, limits, colour_space="HSV"):
         cvt = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
     elif colour_space == "HSV":
         cvt = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    else:
+        cvt = img.copy()
 
     limits = np.array(list(zip(*limits)))
     mask = cv2.inRange(cvt, limits[0], limits[1])
@@ -69,7 +71,7 @@ def decode_segmentation(filename):
     return annotation
 
 
-def batch_threshold_segmentation(limits=[[0, 255], [54, 255], [0, 255]], colour_space="HSV", in_dir=IMG_DIR, out_dir=ANN_DIR):
+def batch_threshold_segmentation(limits=([0, 255], [54, 255], [0, 255]), colour_space="HSV", in_dir=IMG_DIR, out_dir=ANN_DIR):
     ensure_dir(out_dir)
 
     for in_f, out_f in files(in_dir=in_dir, out_dir=out_dir, in_ext=".jpg", out_ext=".png"):
@@ -93,7 +95,7 @@ def batch_resize(in_dir, out_dir, ratio=.5):
         resize(in_f, out_f, ratio)
 
 
-def prepare_annotator(img_dir=IMG_DIR, ann_dir=ANN_DIR, app_dir=APP_DIR, classes=["background", "plant", "panicle"]):
+def prepare_annotator(img_dir=IMG_DIR, ann_dir=ANN_DIR, app_dir=APP_DIR, classes=("background", "plant", "panicle")):
     img_out_dir = app_dir + "/data/images"
     for f in files(img_out_dir, ".jpg"):
         os.remove(f)
