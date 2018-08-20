@@ -4,8 +4,12 @@ from utils import ensure_dir, file_message, files
 import cv2
 import numpy as np
 from PIL import Image
+import shutil
+import json
+import os
 
 DIR = "./photos/plant1_20180615/entire_plant"
+APP_DIR = "C:/Users/Breght/Documents/Doctoraat/Annotator"
 
 RAW_DIR = DIR + "/raw"
 IMG_DIR = DIR + "/images"
@@ -70,6 +74,49 @@ def batch_threshold_segmentation(limits=[[0, 255], [54, 255], [0, 255]], colour_
 
     for in_f, out_f in files(in_dir=in_dir, out_dir=out_dir, in_ext=".jpg", out_ext=".png"):
         threshold_segmentation(in_f, out_f, limits, colour_space)
+
+
+def resize(in_f, out_f, ratio=.5):
+    img = cv2.imread(in_f, 1)
+    dim = (int(ratio * img.shape[1]), int(ratio * img.shape[0]))
+    resized = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
+    cv2.imwrite(out_f, resized)
+    file_message(out_f)
+
+
+def batch_resize(in_dir, out_dir, ratio=.5):
+    ensure_dir(out_dir)
+
+    for in_f, out_f in files(in_dir=in_dir, out_dir=out_dir, in_ext=".jpg", out_ext=".jpg"):
+        resize(in_f, out_f, ratio)
+    for in_f, out_f in files(in_dir=in_dir, out_dir=out_dir, in_ext=".png", out_ext=".png"):
+        resize(in_f, out_f, ratio)
+
+
+def prepare_annotator(img_dir=IMG_DIR, ann_dir=ANN_DIR, app_dir=APP_DIR, classes=["background", "plant", "panicle"]):
+    img_out_dir = app_dir + "/data/images"
+    for f in files(img_out_dir, ".jpg"):
+        os.remove(f)
+    for f in files(img_dir, ".jpg"):
+        shutil.copy(f, img_out_dir)
+        file_message(img_out_dir + "/" + os.path.basename(f))
+
+    ann_out_dir = app_dir + "/data/annotations"
+    for f in files(ann_out_dir, ".png"):
+        os.remove(f)
+    for f in files(ann_dir, ".png"):
+        shutil.copy(f, ann_out_dir)
+        file_message(ann_out_dir + "/" + os.path.basename(f))
+
+    jsonfile = files(app_dir + "/data", ".json")[0]
+    with open(jsonfile, "r") as read_file:
+        data = json.load(read_file)
+    data["labels"] = classes
+    data["imageURLs"] = ["data/images/" + os.path.basename(f) for f in files(img_out_dir, ".jpg")]
+    data["annotationURLs"] = ["data/annotations/" + os.path.basename(f) for f in files(ann_out_dir, ".png")]
+    with open(jsonfile, "w") as write_file:
+        json.dump(data, write_file)
+    file_message(jsonfile)
 
 
 if __name__ == "__main__":
