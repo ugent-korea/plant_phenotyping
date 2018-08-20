@@ -18,6 +18,8 @@ CAL_DIR = DIR + "/calibration"
 UND_DIR = DIR + "/undistorted"
 UNDCR_DIR = DIR + "/undistorted_cropped"
 ARUCO_DIR = DIR + "/ArUco"
+RESIZE_DIR = DIR + "/resized"
+TRANSFER_DIR = DIR + "/transfer"
 
 
 def raw2jpg(in_f, out_f):
@@ -125,3 +127,6 @@ if __name__ == "__main__":
     batch_raw2jpg(RAW_DIR, IMG_DIR)
     batch_raw2jpg(CAL_DIR, CAL_DIR)
     batch_threshold_segmentation(limits=[[0, 255], [54, 255], [0, 255]], colour_space="HSV", in_dir=IMG_DIR, out_dir=ANN_DIR)
+
+    batch_resize(IMG_DIR, RESIZE_DIR, .5)
+    prepare_annotator(TRANSFER_DIR, ANN_DIR, APP_DIR, ("background", "plant", "panicle"))
