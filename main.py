@@ -19,7 +19,8 @@ UND_DIR = DIR + "/undistorted"
 UNDCR_DIR = DIR + "/undistorted_cropped"
 ARUCO_DIR = DIR + "/ArUco"
 RESIZE_DIR = DIR + "/resized"
-TRANSFER_DIR = DIR + "/transfer"
+IMG_TRANSFER_DIR = DIR + "/img_transfer"
+ANN_TRANSFER_DIR = DIR + "/ann_transfer"
 
 
 def raw2jpg(in_f, out_f):
@@ -124,9 +125,15 @@ def prepare_annotator(img_dir=IMG_DIR, ann_dir=ANN_DIR, app_dir=APP_DIR, classes
 
 
 if __name__ == "__main__":
+    # step 1: convert images from raw to jpeg
     batch_raw2jpg(RAW_DIR, IMG_DIR)
     batch_raw2jpg(CAL_DIR, CAL_DIR)
-    batch_threshold_segmentation(limits=[[0, 255], [54, 255], [0, 255]], colour_space="HSV", in_dir=IMG_DIR, out_dir=ANN_DIR)
-
+    # step 2: make images smaller for more convenient use in annotator tool
     batch_resize(IMG_DIR, RESIZE_DIR, .5)
-    prepare_annotator(TRANSFER_DIR, ANN_DIR, APP_DIR, ("background", "plant", "panicle"))
+    # step 3: do the segmentation of the resized images
+    batch_threshold_segmentation(limits=[[0, 255], [54, 255], [0, 255]], colour_space="HSV", in_dir=RESIZE_DIR, out_dir=ANN_DIR)
+    # step 4: prepare the annotator tool (give the tool the images and annotations)
+    #   first create the IMG_TRANSFER_DIR and ANN_TRANSFER_DIR directories,
+    #   and move some images and corresponding annotations in the folder,
+    #   then run the prepare_annotator function
+    prepare_annotator(IMG_TRANSFER_DIR, ANN_TRANSFER_DIR, APP_DIR, ("background", "plant", "panicle"))
